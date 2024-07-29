@@ -1,6 +1,8 @@
-import { SelectedPage } from "@/shared/types";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
 import AnchorLink from "react-anchor-link-smooth-scroll";
+import { SelectedPage } from "@/shared/types";
 
 const childVariant = {
   hidden: { opacity: 0, scale: 0.9 },
@@ -15,6 +17,21 @@ type Props = {
 };
 
 const Benefit = ({ icon, title, description, setSelectedPage }: Props) => {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    async function getUser() {
+      try {
+        const response = await axios.get('https://api.coindesk.com/v1/bpi/currentprice.json');
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    getUser();
+  }, []);
+
   return (
     <motion.div
       variants={childVariant}
@@ -35,6 +52,12 @@ const Benefit = ({ icon, title, description, setSelectedPage }: Props) => {
       >
         <p>Learn More</p>
       </AnchorLink>
+
+      {data && (
+        <div className="mt-4">
+          <p>Bitcoin Price: {data.bpi.USD.rate}</p>
+        </div>
+      )}
     </motion.div>
   );
 };
